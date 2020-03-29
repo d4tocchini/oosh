@@ -4,10 +4,11 @@
 
 **WARNING** yet to evolve from personal tool to proper OSS, v1 todos:
 
-[ ] remove hard coded `rc` file
-[ ] legit install scripts
-[ ] composable within existing zsh configs
-[ ] OS support beyond darwin
+* [ ] remove hard coded `rc` file
+* [ ] legit install scripts
+* [ ] composable within existing zsh configs
+* [ ] OS support beyond darwin
+* [ ] remove bin/oocc, establish plugin arch or something...
 
 ## install
 
