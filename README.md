@@ -34,7 +34,7 @@ to load and use the script object:
 
 ```sh
 oosh
-src example/pkg.sh
+. ./example/pkg.sh
 pkg.example.hello "bob"
 ```
 
