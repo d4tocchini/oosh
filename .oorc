@@ -1,0 +1,325 @@
+export __AEXILED__=1
+
+zmodload zsh/pcre
+setopt REMATCH_PCRE
+
+# config
+export MOD_SEP_SYM="."
+
+NO=1
+YES=0
+
+# TODO
+# https://stackoverflow.com/questions/6109225/echoing-the-last-command-run-in-bash
+
+# aerc () { source $AERC_PATH }
+
+# TODO: SWAP RC FILE BACK IN
+
+aerc() {
+    exec ae
+}
+
+local __target=""
+local __deps=()
+
+
+
+# depdirt $target_path [$dep ...]
+amalg () {
+
+        depdirt "$@" || return YES
+
+        local target="$__target"
+        argv=($argv[2,-1])
+        rm -f "$target"
+        print "" > "$target"
+
+        while [[ $# -gt 0 ]]; do
+                local dep="$1"
+                [[ "$dep" =~  ^([\~\.\/]) ]] || dep="${PWD}/$dep"
+                print "$target : $dep"
+
+                # TODO: checking again?..
+                [[ -f "$dep" ]] && ( cat "$dep" >> "$target" )
+                argv=($argv[2,-1])
+        done
+
+}
+
+# depdirt $target_path [$dep ...]
+# TODO: .PHONY
+depdirt () {
+        local target="$1"
+        argv=($argv[2,-1])
+        # print "$target : $@"
+
+        # target=`realpath "$target"``
+        [[ "$target" =~  ^([\~\.\/]) ]] || target="${PWD}/$target"
+        # print "$target : $@"
+
+        __target="$target"
+
+        [[ -a "$target" ]] || return YES ;
+
+        while [[ $# -gt 0 ]]; do
+                local dep="$1"
+                [[ "$dep" =~  ^([\~\.\/]) ]] || dep="${PWD}/$dep"
+                # print "$target : $dep"
+
+                [[ "$dep" -nt "$target" ]] && return YES;
+                argv=($argv[2,-1])
+        done
+        # echo  $# $1
+
+        [[ $# -gt 0 ]] && return YES || return NO
+}
+
+is-f () {
+    [[ -a "$1" ]] && return YES || return NO
+}
+
+is-d () {
+    [[ -d "$1" ]] && return YES || return NO
+}
+
+ls-fn () {
+    print -l ${(ok)functions}
+}
+
+ls-fnstack () {
+    print $funcstack
+}
+
+ls-paths () {
+    ls "$@" | CMD="ls $@" mawk '
+        BEGIN {
+            CMD = ENVIRON["CMD"]
+            # -1
+            if (CMD !~ /[ ]+\-1/) {
+                ORS = " "
+            }
+            else {
+                ORS = "\n"
+            }
+        }
+        {
+            print ENVIRON["PWD"] "/" $0
+        }
+    '
+}
+
+alias "."="srcc"
+alias "source"="srcc"
+srcc() {
+    [[ ! -f "$1.zwc" ]] || [[ "$1" -nt "$1.zwc" ]] && zcompile $1
+    builtin source $@
+}
+
+src () { # implements `source ...files`
+    print `ls -1 ${@} | mawk '{ print("source " $0); }'`
+}
+
+aero() {
+    srcc ./.aero
+}
+
+# @ () {
+#     # ( -d "$1" ) && ( ( -f "$1/aeon" ) || ( print "$1/aeon not found" ) )
+
+#     if [[ -f "${1}/@" ]] ; then
+#         source "${1}/@"
+#     fi
+
+#     ((!$#)) && return NO
+
+#     type $1 >/dev/null || ( -f "$1"/@ ) && {
+#         source "$1"/@
+#         argv=($argv[2,-1])
+#     } || return NO
+
+#     {
+#         pushd .
+#         ${argv}
+
+#     } always {
+#         popd
+#     }
+# }
+
+alias space="__space \"\$0:A\""
+
+__space () {
+    # TODO: clean old funcs..
+    # eval '' ...
+    # } always { https://www.zsh.org/mla/users/2011/msg00207.html
+    #     unfunction -m "$0_*"
+    # }
+
+    # MOD_CURRENT
+    # print "{eval 'mod.$MOD_CURRENT.path=\$0'"
+
+    local FILENAME="$1"
+    local DIRNAME=`dirname "$1"`
+    # argv=$argv[2,-1]
+    local SPACENAME="$2"
+    # print
+
+
+    print "
+        eval SEP=\"${MOD_SEP_SYM}\";
+        eval FILENAME=\"${FILENAME}\";
+        eval DIRNAME=\"${DIRNAME}\";
+        eval SPACENAME=\"${SPACENAME}\";
+    "
+}
+mod () {
+    # print "mod a1 =$1" &;
+    # unset mod_name mod_path fn_prefix
+    local mod_name="$1"
+    # print "mod_name=$mod_name" &;
+    local mod_path="${SPACENAME}${SEP}${mod_name}"
+    local fn_prefix="${mod_path}${SEP}"
+    print "
+        eval local this=\"${mod_path}\";
+        eval local mod_path=\"${mod_path}\";
+        eval local fn_prefix=\"${fn_prefix}\";
+        eval local mod_name=\"${mod_name}\";
+        eval local mod_dir=\"${DIRNAME}\";
+
+        eval '${mod_path} () {
+            local this=\"${mod_path}\";
+            local mod_path=\"${mod_path}\";
+            local fn_prefix=\"${fn_prefix}\";
+            local mod_name=\"${mod_name}\";
+            local mod_dir=\"${DIRNAME}\";
+            \"${fn_prefix}\$1\" \$argv[2,-1];
+        }';
+
+        eval alias mod0=\"${mod_path}\";
+
+        eval '${fn_prefix}dir (){ print ${DIRNAME} }';
+        eval '${fn_prefix}name (){ print ${mod_name} }';
+
+        eval 'fn () {
+            print \"${fn_prefix}\$1\"
+        }';
+
+    "
+}
+
+
+# alias mod="eval _mod_ \"\$0:A\""
+# _mod_ () {
+#     # TODO: clean old funcs..
+#     # eval '' ...
+#     # } always { https://www.zsh.org/mla/users/2011/msg00207.html
+#     #     unfunction -m "$0_*"
+#     # }
+#     local MOD_DIR=`dirname "$1"`
+#     argv=$argv[2,-1]
+
+#     local MOD_NAME="$1"
+#     local SEP="$MOD_SEP_SYM"
+#     print "*** $MOD_NAME : $MOD_DIR ***"
+
+#     fn () {
+#         # if $2 alias $2=$1
+#         print "mod.$MOD_NAME.$1"
+#     }
+#     eval "fn (){ print \"mod.${MOD_NAME}.\$1\" }"
+
+#     eval "mod${SEP}${MOD_NAME}${SEP}dir (){ print $MOD_DIR }"
+#     eval "mod${SEP}${MOD_NAME}${SEP}name (){ print $MOD_NAME }"
+#     eval "mod${SEP}${MOD_NAME} (){ local modname=${MOD_NAME}; \"mod${SEP}\$modname${SEP}\$1\" \$argv[2,-1]; }"
+#     alias mod="mod${SEP}${MOD_NAME}"
+#     # MOD_CURRENT
+#     # print "{eval 'mod.$MOD_CURRENT.path=\$0'"
+# }
+
+# space () {
+#     print "TODO...."
+# }
+
+use () {
+    print "TODO...."
+}
+
+
+
+# alias __HELP__="which \$0"
+
+# argv.print () {
+#     print $argv[@]
+# }
+
+# alias -g @-=''
+# alias -g @opt=''
+
+# export mod.exec ()
+# {
+#     ((!$#)) && return NO
+#     pushd .
+#         alias cmd="$1:"
+#         ${cmd} $@
+#     popd
+# }
+
+# export mod.exec-required ()
+# {
+#     if [ -z "$1" ]; then
+#         echo -e "\nERROR: '$0 <argument>' arguments required\n"
+#         exit 1
+#     fi
+# }
+
+
+
+
+
+    # PROMPT_OK_SYM="√"
+    CL_OK_SYM='▶︎'
+    CL_ERR_SYM='?' # ? ⚠️ ∫⨕ ∅
+    CL_SYM_SEP=' ' #
+    CL_PROMPT_SEP=' ' #' %# '
+    export PROMPT='%(?.%F{green}'${CL_OK_SYM}'.%F{red}'${CL_ERR_SYM}'%?)%f'$CL_SYM_SEP'%B%F{240}%1~%f%b'${CL_PROMPT_SEP}
+    export RPROMPT='%*'
+
+
+#     function collapse_pwd {
+#     echo $(pwd | sed -e "s,^$HOME,~,")
+# }
+
+# # function prompt_char {
+# #     git branch >/dev/null 2>/dev/null && echo '±' && return
+# #     hg root >/dev/null 2>/dev/null && echo '☿' && return
+# #     echo '○'
+# # }
+
+# # function battery_charge {
+# #     echo `$BAT_CHARGE` 2>/dev/null
+# # }
+
+# # function virtualenv_info {
+# #     [ $VIRTUAL_ENV ] && echo '('`basename $VIRTUAL_ENV`') '
+# # }
+
+# # function hg_prompt_info {
+# #     hg prompt --angle-brackets "\
+# # < on %{$fg[magenta]%}<branch>%{$reset_color%}>\
+# # < at %{$fg[yellow]%}<tags|%{$reset_color%}, %{$fg[yellow]%}>%{$reset_color%}>\
+# # %{$fg[green]%}<status|modified|unknown><update>%{$reset_color%}<
+# # patches: <patches|join( → )|pre_applied(%{$fg[yellow]%})|post_applied(%{$reset_color%})|pre_unapplied(%{$fg_bold[black]%})|post_unapplied(%{$reset_color%})>>" 2>/dev/null
+# # }
+
+# # PROMPT='
+# # %{$fg[magenta]%}%n%{$reset_color%} at %{$fg[yellow]%}%m%{$reset_color%} in %{$fg_bold[green]%}$(collapse_pwd)%{$reset_color%}$(hg_prompt_info)$(git_prompt_info)
+# # $(virtualenv_info)$(prompt_char) '
+
+# # RPROMPT='$(battery_charge)'
+
+# # ZSH_THEME_GIT_PROMPT_PREFIX=" on %{$fg[magenta]%}"
+# # ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
+# # ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[green]%}!"
+# # ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg[green]%}?"
+# # ZSH_THEME_GIT_PROMPT_CLEAN=""

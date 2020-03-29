@@ -1,0 +1,86 @@
+
+print "cc/aero"
+
+`space ae`
+
+function () {
+    `mod c-api`
+
+    `fn g-link` () {
+        print "cc/aero"
+        print "(g)linking... gcc g++ ln nm libtoolize libtoolar ranlib dd"
+        gln -s --force /usr/local/bin/gln  /usr/local/bin/ln
+        gln -s --force /usr/local/bin/gcc-9 /usr/local/bin/gcc
+        gln -s --force /usr/local/bin/g++-9 /usr/local/bin/g++
+        gln -s --force /usr/local/bin/gcc-nm-9 /usr/local/bin/nm
+        gln -s --force /usr/local/bin/glibtoolize /usr/local/bin/libtoolize
+
+        # gln -s --force /usr/local/bin/glibtool /usr/local/bin/libtool
+            # needs better custom handling...
+            # info glibtool
+            # https://www.gnu.org/software/libtool/manual/html_node/Static-libraries.html
+
+        # gln -s --force /usr/local/bin/gcc-ar-9 /usr/local/bin/ar
+            #  screws up sx
+        gln -s --force /usr/local/bin/gcc-ranlib-9 /usr/local/bin/ranlib
+        gln -s --force /usr/local/bin/gdd /usr/local/bin/gdd
+    }
+
+
+    # `fn ln` () {
+        # --relative
+        # SEE ALSO slink(2), symlink(2)
+    # }
+
+}
+
+# CC
+
+# ONLINE REPL / COMPILERS
+
+    # https://coliru.stacked-crooked.com
+
+    # TIO
+    ## https://github.com/TryItOnline/tiodocker
+    ## https://github.com/TryItOnline/TioSetup
+
+# nm
+# display name list (symbol table)
+    # also,  llvm-nm(1)
+# Nm displays the name list (symbol table  of  nlist  structures)  of  each
+# o or a file in the argument list.  In some cases, as with an object that
+# has had strip(1) with its -T option used on the object, that can be  dif-
+# ferent  than the dyld information.  For that information use dyldinfo(1).
+
+# ranlib - add or update the table of contents of archive libraries
+# libtool - create libraries
+
+# Dynamically  linked  libraries,  unlike  statically linked libraries, are
+# Mach-O format files and  not  ar(5)  format  files.
+
+# Dynamically  linked
+# libraries  have  two  restrictions: No symbol may be defined in more than
+# one object file and no common symbol can be used.  To maximize sharing of
+# a  dynamically  linked shared library the objects should be compiled with
+# the -dynamic flag of cc(1) to produce indirect undefined  references  and
+# position-independent  code.   To  build  a  dynamically  linked  library,
+# libtool, runs the link editor, ld(1), with -dylib once for each architec-
+# ture  present in the input objects and then lipo(1) to create a universal
+# file if needed.
+
+
+# gdir
+# gdircolors
+# gdirname
+# glink
+# gmkdir
+# gmkfifo
+# gmktmp
+# gnice
+# gprintf
+# grealpath
+# grexec
+    # rexec - Remote execution client
+# gtty
+# gkill
+

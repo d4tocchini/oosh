@@ -1,0 +1,11 @@
+{
+  "name": "oosh",
+  "version": "0.0.1",
+  "description": "Object Oriented Shell",
+  "main": "index.js",
+  "scripts": {
+    "install": "./install.sh"
+  },
+  "author": "",
+  "license": "ISC"
+}

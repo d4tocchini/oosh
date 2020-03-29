@@ -1,0 +1,1 @@
+echo "from " test.2.sh

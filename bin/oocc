@@ -1,0 +1,19 @@
+#!/usr/local/bin/zsh
+
+echo "$@" | mawk '
+    BEGIN {
+        ORS=" "
+        RS="[ \t\n]+"
+        argv="gcc-9"
+    }
+    /^\-stdlib/ {
+        next
+    }
+    {
+        argv = argv " " $0
+    }
+    END {
+        print argv
+    }
+' | zsh
+

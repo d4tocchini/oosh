@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# https://www.linuxjournal.com/content/using-named-pipes-fifos-bash
+
+# SWAP OUT ZSHRC
+export RC_FILE=".zshrc"
+export RC_FILE_TMP=".zshrctmp"
+
+if [ -z "$__AEXILED__" ] ; then
+    export AE_SH_PATH="`realpath $0`"
+    export AE_SH_DIR="`dirname ${AE_SH_PATH}`"
+
+    if [[ ! -a "${HOME}/${RC_FILE_TMP}" && -a "${HOME}/${RC_FILE}" ]] ; then
+        mv -f "${HOME}/${RC_FILE}" "${HOME}/${RC_FILE_TMP}"
+    fi
+
+    # [[ -f /usr/local/bin/ae ]] || ln -fs "$AE_SH_PATH" "/usr/local/bin/ae"
+
+    ln -fs "$AE_SH_DIR"/.oorc "${HOME}/${RC_FILE}"
+fi
+
+
+
+# pipe=/tmp/testpipe
+# mkfifo "/tmp/ae.in.zshrc"
+# mkfifo "/tmp/ae.out.zshrc"
+
+#     cat "~/.zshrc" |
+# mv      "~/.zshrc" "/tmp/oorc.zshrc"
+# ln -s   "~/.oorc" "~/.zshrc"
+
+# zsh/mapfile module provides one special associative array parameter of the same name.
+# http://zsh.sourceforge.net/Doc/Release/QQZsh-Modules.html#The-zsh_002fmathfunc-Module
+
+
+# Before anything else, set the PATH_SCRIPT variable
+    # http://zsh.sourceforge.net/Doc/Release/Invocation.html
+    # If there are any remaining arguments after option processing, and neither of the options -c or -s was supplied, the first argument is taken as the file name of a script containing shell commands to be executed. If the option PATH_SCRIPT is set, and the file name does not contain a directory path (i.e. there is no ‘/’ in the name), first the current directory and then the command path given by the variable PATH are searched for the script. If the option is not set or the file name contains a ‘/’ it is used directly.
+    pushd `dirname $0` > /dev/null; PATH_SCRIPT=`pwd -P`; popd > /dev/null
+
+
+    # . ./sh
+
+    # AE_PRELOAD_SH="echo 111;"
+
+    # export PATH_SCRIPT="$PWD/sh"
+    exec zsh -is
+    # chsh -s /bin/zsh
+    # PATH_SCRIPT="$PWD/sh" exec zsh
+
+
+
