@@ -44,7 +44,9 @@ fi
     # AE_PRELOAD_SH="echo 111;"
 
     # export PATH_SCRIPT="$PWD/sh"
+    export OO_INIT="$@"
     exec zsh -is
+
     # chsh -s /bin/zsh
     # PATH_SCRIPT="$PWD/sh" exec zsh
 
