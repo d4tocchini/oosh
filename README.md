@@ -8,7 +8,7 @@
 * [ ] legit install scripts
 * [ ] composable within existing zsh configs
 * [ ] OS support beyond darwin
-* [ ] remove bin/oocc, establish plugin arch or something...
+* [ ] remove bin/oocc & cc/*, establish plugin arch or something...
 
 ## install
 
