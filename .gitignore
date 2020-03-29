@@ -1,4 +1,5 @@
 .vscode
+*.zwc
 build
 zzz
 *.ignore
